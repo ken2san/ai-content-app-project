@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIコンテンツ自動生成パイプライン</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tone.js CDNの読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', 'Noto Sans JP', sans-serif;
+            background-color: #EAEAEA; /* Light Gray from Brilliant Blues */
+            color: #0A2463; /* Dark Blue from Brilliant Blues */
+        }
+        .container-card {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .btn-primary {
+            background-color: #3E92CC; /* Medium Blue from Brilliant Blues */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #0A2463; /* Dark Blue from Brilliant Blues */
+        }
+        .progress-bar-container {
+            background-color: #D8E4FF; /* Light Blue from Brilliant Blues */
+            border-radius: 0.5rem;
+            height: 1.5rem;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            background-color: #3E92CC; /* Medium Blue from Brilliant Blues */
+            height: 100%;
+            width: 0%;
+            border-radius: 0.5rem;
+            transition: width 0.5s ease-in-out;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            width: 400px;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-4xl font-extrabold text-center mb-8 text-[#0A2463]">AIコンテンツ自動生成パイプライン</h1>
+        <p class="text-center text-lg mb-12 text-gray-700">AIとの対話を通じてコンテンツの設計図（JSON）を生成し、それを元に映像、音楽、音声コンテンツを自動で作成・統合するプロセスを体験しましょう。</p>
+
+        <!-- ステップ1: アイデア入力とJSONプロンプト生成 -->
+        <section class="container-card">
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">1. コンテンツのアイデアを入力 & JSONプロンプトを生成</h2>
+            <p class="mb-4 text-gray-700">作成したいコンテンツのテーマやあらすじを入力してください。例：「幼馴染が、結婚して、色々あって、最後二人で老後を過ごす話」</p>
+            <textarea id="userPromptInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3E92CC] focus:border-transparent text-gray-800" rows="4" placeholder="コンテンツのアイデアを入力..."></textarea>
+            <button id="generateJsonBtn" class="btn-primary mt-4 w-full">AIにJSONプロンプトを生成させる</button>
+        </section>
+
+        <!-- ステップ2: JSONプロンプト表示 -->
+        <section class="container-card" id="jsonDisplaySection" style="display:none;">
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">2. 生成されたJSONプロンプト</h2>
+            <pre id="jsonOutput" class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm text-gray-800 border border-gray-200"></pre>
+            <button id="startContentGenerationBtn" class="btn-primary mt-4 w-full" disabled>コンテンツ生成を開始</button>
+        </section>
+
+        <!-- ステップ3: コンテンツ生成シミュレーション -->
+        <section class="container-card" id="contentGenerationSection" style="display:none;">
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">3. コンテンツ生成中...</h2>
+            <div class="progress-bar-container mb-4">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <p id="generationStatus" class="text-center mb-6 font-semibold text-[#0A2463]">準備中...</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- 映像シミュレーション -->
+                <div class="bg-[#D8E4FF] p-4 rounded-lg flex flex-col items-center justify-center min-h-[200px]">
+                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">映像コンテンツ</h3>
+                    <img id="videoPlaceholder" src="https://placehold.co/320x180/A1D2CE/0A2463?text=映像生成待機中..." alt="映像プレースホルダー" class="w-full max-w-sm rounded-lg shadow-md">
+                    <p id="currentSceneText" class="text-center mt-3 text-gray-700 text-sm"></p>
+                </div>
+
+                <!-- 音声シミュレーション -->
+                <div class="bg-[#D8E4FF] p-4 rounded-lg flex flex-col items-center justify-center min-h-[200px]">
+                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">音声コンテンツ</h3>
+                    <div class="flex space-x-4 mb-4">
+                        <button id="playMusicBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>音楽再生 ▶</button>
+                        <button id="playSFXBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>効果音再生 ▶</button>
+                    </div>
+                    <div class="bg-white p-3 rounded-lg w-full max-w-sm text-center shadow-inner">
+                        <p id="dialogueText" class="text-lg font-semibold text-[#0A2463]">セリフ表示エリア</p>
+                    </div>
+                </div>
+            </div>
+            <p class="text-sm text-gray-600 text-center mt-4">※音楽・効果音はシミュレーション用の簡素な音です。</p>
+        </section>
+
+        <!-- ステップ4: 最終出力とYouTubeアップロード -->
+        <section class="container-card" id="finalOutputSection" style="display:none;">
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">4. コンテンツ完成 & アップロード</h2>
+            <p class="mb-6 text-center text-lg text-gray-700">全てのコンテンツが生成・統合されました。最終的な出力準備が整いました！</p>
+            <div class="text-center">
+                <button id="simulateUploadBtn" class="btn-primary px-8 py-4 text-xl">YouTubeアップロードをシミュレート</button>
+                <p id="uploadStatus" class="mt-4 text-lg font-semibold text-[#0A2463]"></p>
+                <div id="finalVideoPlayer" class="mt-4" style="display:none;">
+                    <h3 class="font-bold mb-2 text-[#0A2463]">完成動画プレビュー</h3>
+                    <video controls class="w-full max-w-md mx-auto rounded-lg shadow-lg" id="generatedVideoPreview" type="video/mp4"></video>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- カスタムモーダル -->
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <p id="modalMessage" class="text-xl font-bold text-[#0A2463] mb-4"></p>
+            <button id="closeModalBtn" class="btn-primary">閉じる</button>
+        </div>
+    </div>
+
+    <script>
+        // バックエンドサーバーのURLを設定
+        const BACKEND_URL = 'http://127.0.0.1:8000';
+
+        // Tone.jsのセットアップ
+        let synth = new Tone.Synth().toDestination();
+        let noise = new Tone.NoiseSynth().toDestination();
+
+        // UIエレメントの取得
+        const userPromptInput = document.getElementById('userPromptInput');
+        const generateJsonBtn = document.getElementById('generateJsonBtn');
+        const jsonDisplaySection = document.getElementById('jsonDisplaySection');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const startContentGenerationBtn = document.getElementById('startContentGenerationBtn');
+        const contentGenerationSection = document.getElementById('contentGenerationSection');
+        const progressBar = document.getElementById('progressBar');
+        const generationStatus = document.getElementById('generationStatus');
+        const videoPlaceholder = document.getElementById('videoPlaceholder');
+        const currentSceneText = document.getElementById('currentSceneText');
+        const playMusicBtn = document.getElementById('playMusicBtn');
+        const playSFXBtn = document.getElementById('playSFXBtn');
+        const dialogueText = document.getElementById('dialogueText');
+        const finalOutputSection = document.getElementById('finalOutputSection');
+        const simulateUploadBtn = document.getElementById('simulateUploadBtn');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const customModal = document.getElementById('customModal');
+        const modalMessage = document.getElementById('modalMessage');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const finalVideoPlayer = document.getElementById('finalVideoPlayer');
+        const generatedVideoPreview = document.getElementById('generatedVideoPreview');
+
+        let currentGeneratedJson = null; // AIが生成したJSONをここに保持
+
+        // 初期状態で「コンテンツ生成を開始」ボタンを無効化
+        startContentGenerationBtn.disabled = true;
+
+        // モーダル表示関数
+        function showModal(message) {
+            modalMessage.textContent = message;
+            customModal.style.display = 'flex';
+        }
+
+        // モーダル非表示関数
+        closeModalBtn.addEventListener('click', () => {
+            customModal.style.display = 'none';
+        });
+
+        // JSONプロンプト生成ボタンのイベントリスナー
+        generateJsonBtn.addEventListener('click', async () => {
+            const userPrompt = userPromptInput.value;
+            if (!userPrompt.trim()) {
+                showModal("コンテンツのアイデアを入力してください！");
+                return;
+            }
+
+            generationStatus.textContent = "AIがJSONプロンプトを生成中...";
+            jsonDisplaySection.style.display = 'block'; // JSON表示セクションを表示
+            startContentGenerationBtn.disabled = true; // 生成中はボタンを無効化
+            generateJsonBtn.disabled = true;
+
+            try {
+                // バックエンドの /generate-json-prompt エンドポイントを呼び出す
+                const response = await fetch(`${BACKEND_URL}/generate-json-prompt`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userPrompt: userPrompt })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'AIによるJSON生成に失敗しました');
+                }
+
+                const generatedResponse = await response.json();
+
+                // ここが修正点：generatedResponse.json_data を currentGeneratedJson に代入するように統一
+                if (generatedResponse.json_data) { // json_data が存在すればそれを使う
+                    currentGeneratedJson = generatedResponse.json_data;
+                    // メッセージは生成されたメッセージがあればそれを使う
+                    generationStatus.textContent = generatedResponse.message || "AIによるJSONプロンプト生成完了！";
+                } else { // json_data がなければ、generatedResponse そのものがJSONデータ本体とみなす
+                    currentGeneratedJson = generatedResponse;
+                    generationStatus.textContent = "AIによるJSONプロンプト生成完了！"; // デフォルトメッセージ
+                }
+
+                // JSONを文字列化し、\n (エスケープされた \n) を実際の改行に置換して表示
+                // pre タグ内で改行が正しく表示されるようにする
+                jsonOutput.textContent = JSON.stringify(currentGeneratedJson, null, 2)
+                    .replace(/\\n/g, '\n')   // Escaped \\n を実際の改行 \n に置換
+                    .replace(/\\r/g, '\r');  // Escaped \\r を実際の改行 \r に置換（CRLF対策）
+
+
+                startContentGenerationBtn.disabled = false; // Enable content generation button after JSON is generated
+
+
+            } catch (error) {
+                console.error("JSON generation error:", error);
+                let errorMessage = `JSON generation error: ${error.message}`;
+                if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                    errorMessage += "\n\nBackend server (app.py) might not be running or accessible from the browser.\nAre you running `python app.py` in your terminal?";
+                }
+                // エラー応答に `dummy_fallback` フラグと `json_data` が含まれている場合を処理
+                // ここは修正前と同様、エラー時の特別な処理
+                if (error.dummy_fallback && error.json_data) {
+                    currentGeneratedJson = error.json_data; // ダミーデータを現在のJSONとして設定
+                    jsonOutput.textContent = JSON.stringify(currentGeneratedJson, null, 2)
+                        .replace(/\\n/g, '\n') // Escaped \\n を実際の改行 \n に置換
+                        .replace(/\\r/g, '\r');  // Escaped \\r を実際の改行 \r に置換
+                    startContentGenerationBtn.disabled = false;
+                    errorMessage = error.error + "\n\n(AIが有効なJSONを生成できなかったため、ダミーデータで続行します。)";
+                    generationStatus.textContent = "AIによるJSON生成失敗、ダミーデータで続行。";
+                } else {
+                    generationStatus.textContent = "JSON generation failed.";
+                }
+                showModal(errorMessage);
+            } finally {
+                generateJsonBtn.disabled = false;
+            }
+        });
+
+        // Content generation start button event listener
+        startContentGenerationBtn.addEventListener('click', async () => {
+            if (!currentGeneratedJson) {
+                showModal("Please generate a JSON prompt with the AI first.");
+                return;
+            }
+
+            contentGenerationSection.style.display = 'block'; // Show content generation section
+            startContentGenerationBtn.disabled = true;
+            generateJsonBtn.disabled = true; // Disable JSON generation button during content generation
+            playMusicBtn.disabled = false; // Enable for simulation
+            playSFXBtn.disabled = false;   // Enable for simulation
+
+            // Activate Tone.js AudioContext on first user gesture
+            await Tone.start();
+            console.log("AudioContext started.");
+            synth.triggerAttackRelease("C4", "8n"); // Initialization sound
+
+            generationStatus.textContent = "Requesting content generation from backend...";
+            progressBar.style.width = '0%';
+
+            try {
+                // Call backend's /generate-content endpoint
+                const response = await fetch(`${BACKEND_URL}/generate-content`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(currentGeneratedJson) // Send the full AI-generated JSON
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Content generation failed');
+                }
+
+                const result = await response.json();
+                console.log("Result from backend:", result);
+
+                const scenes = currentGeneratedJson.scenes;
+                const totalScenes = scenes.length;
+
+                // Display progress for each scene
+                for (let i = 0; i < totalScenes; i++) {
+                    const scene = scenes[i];
+                    generationStatus.textContent = `Scene ${i + 1}/${totalScenes}: ${scene.action_description}`;
+                    progressBar.style.width = ((i + 1) / totalScenes * 100) + '%';
+
+                    // Use placeholder.co for simulation or actual image URL if available from backend
+                    const placeholderColors = [
+                        "A1D2CE", "D8E4FF", "3E92CC", "0A2463", "5B84B1"
+                    ];
+                    const placeholderColor = placeholderColors[i % placeholderColors.length];
+                    videoPlaceholder.src = `https://placehold.co/320x180/${placeholderColor}/FFFFFF?text=Scene%20${i+1}%20Generated`;
+                    currentSceneText.textContent = `Location: ${scene.location}, Time of Day: ${scene.time_of_day}\n${scene.action_description}`;
+                    dialogueText.textContent = scene.dialogue;
+
+                    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate delay for scene display
+                }
+
+                generationStatus.textContent = "All content generation complete! Preparing for integration...";
+                progressBar.style.width = '100%';
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                finalOutputSection.style.display = 'block';
+                generationStatus.textContent = "Final content ready!";
+
+                // Display the generated final video
+                if (result.video_path) {
+                    // Backend returns path like /media/filename.mp4, so prepend BACKEND_URL for frontend access
+                    generatedVideoPreview.src = `${BACKEND_URL}${result.video_path}`;
+                    finalVideoPlayer.style.display = 'block';
+                    generatedVideoPreview.load(); // Reload video to update display
+                }
+
+            } catch (error) {
+                console.error("Content generation start error:", error);
+                let errorMessage = `Content generation error: ${error.message}`;
+                if (error instanceof TypeError && error.message === 'Failed to fetch') {
+                    errorMessage += "\n\nBackend server (app.py) might not be running or accessible from the browser.\nAre you running `python app.py` in your terminal?";
+                }
+                showModal(errorMessage);
+                generationStatus.textContent = "Content generation failed.";
+            } finally {
+                startContentGenerationBtn.disabled = false;
+                generateJsonBtn.disabled = false;
+            }
+        });
+
+        // Music playback button
+        playMusicBtn.addEventListener('click', () => {
+            synth.triggerAttackRelease("C4", "8n");
+            synth.triggerAttackRelease("E4", "8n", "+0.5");
+            synth.triggerAttackRelease("G4", "8n", "+1");
+            synth.triggerAttackRelease("C5", "8n", "+1.5");
+            showModal("Music played! (Simulation)");
+        });
+
+        // Sound effects playback button
+        playSFXBtn.addEventListener('click', () => {
+            noise.triggerAttackRelease("8n");
+            showModal("Sound effect played! (Simulation)");
+        });
+
+        // Simulate YouTube upload button
+        simulateUploadBtn.addEventListener('click', async () => {
+            uploadStatus.textContent = "Uploading to YouTube...";
+            simulateUploadBtn.disabled = true;
+            await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate upload delay
+            uploadStatus.textContent = "Upload complete! Published on YouTube! �";
+            showModal("Content uploaded to YouTube! (Simulation)");
+        });
+    </script>
+</body>
+</html>

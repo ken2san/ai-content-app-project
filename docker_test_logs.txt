@@ -1,0 +1,77 @@
+--- ログファイルを初期化します ---
+--- Docker Compose を起動します (コンテナは自動削除) ---
+#1 [internal] load local bake definitions
+#1 reading from stdin 453B done
+#1 DONE 0.0s
+
+#2 [internal] load build definition from Dockerfile
+#2 transferring dockerfile: 1.69kB done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.9-slim-buster
+#3 ...
+
+#4 [auth] library/python:pull token for registry-1.docker.io
+#4 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/library/python:3.9-slim-buster
+#3 DONE 1.8s
+
+#5 [internal] load .dockerignore
+#5 transferring context: 2B done
+#5 DONE 0.0s
+
+#6 [1/9] FROM docker.io/library/python:3.9-slim-buster@sha256:320a7a4250aba4249f458872adecf92eea88dc6abd2d76dc5c0f01cac9b53990
+#6 resolve docker.io/library/python:3.9-slim-buster@sha256:320a7a4250aba4249f458872adecf92eea88dc6abd2d76dc5c0f01cac9b53990 done
+#6 DONE 0.0s
+
+#7 [internal] load build context
+#7 transferring context: 1.93kB done
+#7 DONE 0.0s
+
+#8 [4/9] COPY requirements.txt .
+#8 CACHED
+
+#9 [7/9] COPY ai_content_automation_app.html .
+#9 CACHED
+
+#10 [8/9] COPY app/ app/
+#10 CACHED
+
+#11 [5/9] RUN pip install --no-cache-dir -r requirements.txt
+#11 CACHED
+
+#12 [2/9] WORKDIR /app
+#12 CACHED
+
+#13 [3/9] RUN apt-get update && apt-get install -y     ffmpeg     fontconfig     ttf-dejavu-core     --no-install-recommends &&     rm -rf /var/lib/apt/lists/*
+#13 CACHED
+
+#14 [6/9] COPY main.py .
+#14 CACHED
+
+#15 [9/9] RUN mkdir -p generated_media
+#15 CACHED
+
+#16 exporting to image
+#16 exporting layers done
+#16 exporting manifest sha256:a0c1556866a68b33d63f358f4b1d25bdb0112dca25de3baa8c25de3719684c64 done
+#16 exporting config sha256:d356f52dbf865bffffec839b4677a8ec0451433b5f0ad3ae27cd3b45562b3541 done
+#16 exporting attestation manifest sha256:033234b7003eada43db258fee68db58ca38f49099bc6ab912026e961624f8e1b done
+#16 exporting manifest list sha256:7a9ec83a8a5a782f512d330b979da3df2d39c2a9fe501c9177d46090a68f4dc5 done
+#16 naming to docker.io/library/ai_content_app_project-app:latest done
+#16 unpacking to docker.io/library/ai_content_app_project-app:latest
+#16 unpacking to docker.io/library/ai_content_app_project-app:latest 1.3s done
+#16 DONE 1.3s
+
+#17 resolving provenance for metadata file
+#17 DONE 0.0s
+Attaching to ai-content-pipeline-test
+ai-content-pipeline-test  |  * Serving Flask app 'app'
+ai-content-pipeline-test  |  * Debug mode: on
+--- アプリケーションが停止しました ---
+--- 自動テストスクリプトを実行します ---
+--- テストスクリプトが見つかりませんでした ---
+--- Dockerイメージを削除中 ---
+--- イメージの削除が完了しました ---
+--- 処理終了 ---

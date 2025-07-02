@@ -4,4 +4,5 @@ google-generativeai==0.8.5
 google-cloud-texttospeech==2.16.0
 replicate==0.34.2
 flask-cors==4.0.0
-Pillow==10.3.0  # ★この行を追加してください★
+Pillow==10.3.0
+Flask-Babel==4.0.0

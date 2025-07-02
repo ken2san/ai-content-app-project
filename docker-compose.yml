@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -10,6 +8,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       SKIP_CONTENT_APIS: ${SKIP_CONTENT_APIS}
       FLASK_APP: "main.py"
+      DISABLE_REDIRECT_TO_JA: "True"  # Disable forced redirect for automated tests
     # テスト後に自動的にコンテナを削除したい場合 (開発・テスト環境向け)
     # restart: "no" # これは不要だが、再起動ポリシーの例として
     # 以下の設定はコンテナが終了したときに自動で削除してくれるが、

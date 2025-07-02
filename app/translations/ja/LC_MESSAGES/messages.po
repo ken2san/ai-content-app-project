@@ -1,0 +1,128 @@
+# Japanese translations for AI Content Automation Pipeline.
+# Copyright (C) 2024 YOUR NAME
+# This file is distributed under the same license as the project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: AI Content Automation Pipeline 1.0\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2024-01-08 00:00+0000\n"
+"PO-Revision-Date: 2024-01-08 00:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ja\n"
+"Language-Team: ja <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.9.1\n"
+
+msgid "AI Content Automation Pipeline"
+msgstr "AIコンテンツ自動生成パイプライン"
+
+msgid "Switch to English"
+msgstr "英語に切り替え"
+
+msgid "日本語に切り替え"
+msgstr "日本語に切り替え"
+
+msgid "Enter your prompt here"
+msgstr "ここにプロンプトを入力してください"
+
+msgid "Generate Content"
+msgstr "コンテンツを生成"
+
+msgid "Clear"
+msgstr "クリア"
+
+msgid "Initial image generation is in progress..."
+msgstr "画像を生成中..."
+
+msgid "Speech synthesis is in progress..."
+msgstr "音声を合成中..."
+
+msgid "Background music generation is in progress..."
+msgstr "BGMを生成中..."
+
+msgid "Download Content"
+msgstr "コンテンツをダウンロード"
+
+msgid "AIコンテンツ自動生成パイプライン"
+msgstr "AIコンテンツ自動生成パイプライン"
+
+msgid "AIとの対話を通じてコンテンツの設計図（JSON）を生成し、それを元に映像、音楽、音声コンテンツを自動で作成・統合するプロセスを体験しましょう。"
+msgstr "AIとの対話を通じてコンテンツの設計図（JSON）を生成し、それを元に映像、音楽、音声コンテンツを自動で作成・統合するプロセスを体験しましょう。"
+
+msgid "1. コンテンツのアイデアを入力 & JSONプロンプトを生成"
+msgstr "1. コンテンツのアイデアを入力 & JSONプロンプトを生成"
+
+msgid "作成したいコンテンツのテーマやあらすじを入力してください。例：「幼馴染が、結婚して、色々あって、最後二人で老後を過ごす話」"
+msgstr "作成したいコンテンツのテーマやあらすじを入力してください。例：「幼馴染が、結婚して、色々あって、最後二人で老後を過ごす話」"
+
+msgid "コンテンツのアイデアを入力..."
+msgstr "コンテンツのアイデアを入力..."
+
+msgid "コンテンツ生成を開始"
+msgstr "コンテンツ生成を開始"
+
+msgid "3. コンテンツ生成中..."
+msgstr "3. コンテンツ生成中..."
+
+msgid "映像コンテンツ"
+msgstr "映像コンテンツ"
+
+msgid "音声コンテンツ"
+msgstr "音声コンテンツ"
+
+msgid "4. コンテンツ完成 & アップロード"
+msgstr "4. コンテンツ完成 & アップロード"
+
+msgid "全てのコンテンツが生成・統合されました。最終的な出力準備が整いました！"
+msgstr "全てのコンテンツが生成・統合されました。最終的な出力準備が整いました！"
+
+# API Response Messages
+msgid "リクエストにJSONデータが含まれていません"
+msgstr "リクエストにJSONデータが含まれていません"
+
+msgid "ユーザープロンプトが提供されていません"
+msgstr "ユーザープロンプトが提供されていません"
+
+msgid "APIスキップのためダミーJSONを生成しました。"
+msgstr "APIスキップのためダミーJSONを生成しました。"
+
+msgid "JSONプロンプト生成完了！"
+msgstr "JSONプロンプト生成完了！"
+
+msgid "JSON生成中にエラーが発生しました: {error}"
+msgstr "JSON生成中にエラーが発生しました: {error}"
+
+msgid "JSON生成中にエラーが発生しました。ダミーデータを使用します。詳細: {error}"
+msgstr "JSON生成中にエラーが発生しました。ダミーデータを使用します。詳細: {error}"
+
+msgid "AIにJSONプロンプトを生成させる"
+msgstr "AIにJSONプロンプトを生成させる"
+
+msgid "2. 生成されたJSONプロンプト"
+msgstr "2. 生成されたJSONプロンプト"
+
+msgid "準備中..."
+msgstr "準備中..."
+
+msgid "音楽再生 ▶"
+msgstr "音楽再生 ▶"
+
+msgid "効果音再生 ▶"
+msgstr "効果音再生 ▶"
+
+msgid "セリフ表示エリア"
+msgstr "セリフ表示エリア"
+
+msgid "※音楽・効果音はシミュレーション用の簡素な音です。"
+msgstr "※音楽・効果音はシミュレーション用の簡素な音です。"
+
+msgid "YouTubeアップロードをシミュレート"
+msgstr "YouTubeアップロードをシミュレート"
+
+msgid "完成動画プレビュー"
+msgstr "完成動画プレビュー"

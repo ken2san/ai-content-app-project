@@ -6,11 +6,12 @@ WORKDIR /app
 
 # 必要なシステム依存関係とFFmpegをインストール
 # Pillowが画像生成時に使うフォントも追加 (fontconfigとttf-dejavu-core)
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     ffmpeg \
     fontconfig \
     ttf-dejavu-core \
-    --no-install-recommends && \
+    gettext && \
     rm -rf /var/lib/apt/lists/*
 
 # Pythonの依存関係ファイルをコンテナにコピー
@@ -27,6 +28,20 @@ COPY app/ app/
 # 生成されたメディアファイルを保存するディレクトリを作成
 RUN mkdir -p generated_media
 
+# babel.cfg ファイルをコピー
+COPY babel.cfg .
+
+# Translation setup
+RUN mkdir -p app/translations/en/LC_MESSAGES app/translations/ja/LC_MESSAGES
+
+# Copy translation scripts
+COPY fix_translations.sh .
+COPY update_translations.sh .
+RUN chmod +x fix_translations.sh update_translations.sh
+
+# Compile translations
+RUN cd app && pybabel compile -d translations
+
 # Flaskアプリケーションがリッスンするポートを公開 (Flaskのデフォルトは5000)
 EXPOSE 5000
 
@@ -40,6 +55,12 @@ ENV SKIP_ALL_APIS="False"
 ENV SKIP_CONTENT_APIS="False"
 # アプリケーションのパスを通す
 ENV PYTHONPATH="/app"
+# Flask-Babel用の環境変数
+ENV BABEL_DEFAULT_LOCALE="en"
+ENV BABEL_DEFAULT_TIMEZONE="UTC"
+
+# セッション用のシークレットキー
+ENV FLASK_SECRET_KEY="dev-secret-key"
 
 # Flaskアプリケーションを実行するためのコマンド
 CMD ["python", "main.py"]

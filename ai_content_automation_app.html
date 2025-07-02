@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ request.accept_languages.best_match(['en', 'ja'], 'ja') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AIコンテンツ自動生成パイプライン</title>
+    <title>{{ _('AI Content Automation Pipeline') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tone.js CDNの読み込み -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
@@ -69,69 +69,85 @@
             max-width: 90%;
             width: 400px;
         }
+
+        /* 追加: 言語切替ボタンのスタイル */
+        .language-switcher {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
+    <!-- 言語切替ボタン -->
+    <div class="language-switcher">
+        <a href="?lang=en" class="btn-primary text-sm">{{ _('Switch to English') }}</a>
+        <a href="?lang=ja" class="btn-primary text-sm">{{ _('日本語に切り替え') }}</a>
+    </div>
+
     <div class="max-w-4xl mx-auto">
-        <h1 class="text-4xl font-extrabold text-center mb-8 text-[#0A2463]">AIコンテンツ自動生成パイプライン</h1>
-        <p class="text-center text-lg mb-12 text-gray-700">AIとの対話を通じてコンテンツの設計図（JSON）を生成し、それを元に映像、音楽、音声コンテンツを自動で作成・統合するプロセスを体験しましょう。</p>
+        <h1 class="text-4xl font-extrabold text-center mb-8 text-[#0A2463]">{{ _('AIコンテンツ自動生成パイプライン') }}</h1>
+        <p class="text-center text-lg mb-12 text-gray-700">{{ _('AIとの対話を通じてコンテンツの設計図（JSON）を生成し、それを元に映像、音楽、音声コンテンツを自動で作成・統合するプロセスを体験しましょう。') }}</p>
 
         <!-- ステップ1: アイデア入力とJSONプロンプト生成 -->
         <section class="container-card">
-            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">1. コンテンツのアイデアを入力 & JSONプロンプトを生成</h2>
-            <p class="mb-4 text-gray-700">作成したいコンテンツのテーマやあらすじを入力してください。例：「幼馴染が、結婚して、色々あって、最後二人で老後を過ごす話」</p>
-            <textarea id="userPromptInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3E92CC] focus:border-transparent text-gray-800" rows="4" placeholder="コンテンツのアイデアを入力..."></textarea>
-            <button id="generateJsonBtn" class="btn-primary mt-4 w-full">AIにJSONプロンプトを生成させる</button>
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">{{ _('1. コンテンツのアイデアを入力 & JSONプロンプトを生成') }}</h2>
+            <p class="mb-4 text-gray-700">{{ _('作成したいコンテンツのテーマやあらすじを入力してください。例：「幼馴染が、結婚して、色々あって、最後二人で老後を過ごす話」') }}</p>
+            <textarea id="userPromptInput" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3E92CC] focus:border-transparent text-gray-800" rows="4" placeholder="{{ _('コンテンツのアイデアを入力...') }}"></textarea>
+            <button id="generateJsonBtn" class="btn-primary mt-4 w-full">{{ _('AIにJSONプロンプトを生成させる') }}</button>
         </section>
 
         <!-- ステップ2: JSONプロンプト表示 -->
         <section class="container-card" id="jsonDisplaySection" style="display:none;">
-            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">2. 生成されたJSONプロンプト</h2>
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">{{ _('2. 生成されたJSONプロンプト') }}</h2>
             <pre id="jsonOutput" class="bg-gray-100 p-4 rounded-lg overflow-x-auto text-sm text-gray-800 border border-gray-200"></pre>
-            <button id="startContentGenerationBtn" class="btn-primary mt-4 w-full" disabled>コンテンツ生成を開始</button>
+            <button id="startContentGenerationBtn" class="btn-primary mt-4 w-full" disabled>{{ _('コンテンツ生成を開始') }}</button>
         </section>
 
         <!-- ステップ3: コンテンツ生成シミュレーション -->
         <section class="container-card" id="contentGenerationSection" style="display:none;">
-            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">3. コンテンツ生成中...</h2>
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">{{ _('3. コンテンツ生成中...') }}</h2>
             <div class="progress-bar-container mb-4">
                 <div class="progress-bar-fill" id="progressBar"></div>
             </div>
-            <p id="generationStatus" class="text-center mb-6 font-semibold text-[#0A2463]">準備中...</p>
+            <p id="generationStatus" class="text-center mb-6 font-semibold text-[#0A2463]">{{ _('準備中...') }}</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- 映像シミュレーション -->
                 <div class="bg-[#D8E4FF] p-4 rounded-lg flex flex-col items-center justify-center min-h-[200px]">
-                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">映像コンテンツ</h3>
+                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">{{ _('映像コンテンツ') }}</h3>
                     <img id="videoPlaceholder" src="https://placehold.co/320x180/A1D2CE/0A2463?text=映像生成待機中..." alt="映像プレースホルダー" class="w-full max-w-sm rounded-lg shadow-md">
                     <p id="currentSceneText" class="text-center mt-3 text-gray-700 text-sm"></p>
                 </div>
 
                 <!-- 音声シミュレーション -->
                 <div class="bg-[#D8E4FF] p-4 rounded-lg flex flex-col items-center justify-center min-h-[200px]">
-                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">音声コンテンツ</h3>
+                    <h3 class="font-bold text-xl mb-3 text-[#0A2463]">{{ _('音声コンテンツ') }}</h3>
                     <div class="flex space-x-4 mb-4">
-                        <button id="playMusicBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>音楽再生 ▶</button>
-                        <button id="playSFXBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>効果音再生 ▶</button>
+                        <button id="playMusicBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>{{ _('音楽再生 ▶') }}</button>
+                        <button id="playSFXBtn" class="btn-primary px-6 py-3 disabled:opacity-50" disabled>{{ _('効果音再生 ▶') }}</button>
                     </div>
                     <div class="bg-white p-3 rounded-lg w-full max-w-sm text-center shadow-inner">
-                        <p id="dialogueText" class="text-lg font-semibold text-[#0A2463]">セリフ表示エリア</p>
+                        <p id="dialogueText" class="text-lg font-semibold text-[#0A2463]">{{ _('セリフ表示エリア') }}</p>
                     </div>
                 </div>
             </div>
-            <p class="text-sm text-gray-600 text-center mt-4">※音楽・効果音はシミュレーション用の簡素な音です。</p>
+            <p class="text-sm text-gray-600 text-center mt-4">{{ _('※音楽・効果音はシミュレーション用の簡素な音です。') }}</p>
         </section>
 
         <!-- ステップ4: 最終出力とYouTubeアップロード -->
         <section class="container-card" id="finalOutputSection" style="display:none;">
-            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">4. コンテンツ完成 & アップロード</h2>
-            <p class="mb-6 text-center text-lg text-gray-700">全てのコンテンツが生成・統合されました。最終的な出力準備が整いました！</p>
+            <h2 class="text-2xl font-bold mb-4 text-[#3E92CC]">{{ _('4. コンテンツ完成 & アップロード') }}</h2>
+            <p class="mb-6 text-center text-lg text-gray-700">{{ _('全てのコンテンツが生成・統合されました。最終的な出力準備が整いました！') }}</p>
             <div class="text-center">
-                <button id="simulateUploadBtn" class="btn-primary px-8 py-4 text-xl">YouTubeアップロードをシミュレート</button>
+                <button id="simulateUploadBtn" class="btn-primary px-8 py-4 text-xl">{{ _('YouTubeアップロードをシミュレート') }}</button>
                 <p id="uploadStatus" class="mt-4 text-lg font-semibold text-[#0A2463]"></p>
                 <div id="finalVideoPlayer" class="mt-4" style="display:none;">
-                    <h3 class="font-bold mb-2 text-[#0A2463]">完成動画プレビュー</h3>
+                    <h3 class="font-bold mb-2 text-[#0A2463]">{{ _('完成動画プレビュー') }}</h3>
                     <video controls class="w-full max-w-md mx-auto rounded-lg shadow-lg" id="generatedVideoPreview" type="video/mp4"></video>
                 </div>
             </div>
@@ -142,7 +158,7 @@
     <div id="customModal" class="modal">
         <div class="modal-content">
             <p id="modalMessage" class="text-xl font-bold text-[#0A2463] mb-4"></p>
-            <button id="closeModalBtn" class="btn-primary">閉じる</button>
+            <button id="closeModalBtn" class="btn-primary">{{ _('閉じる') }}</button>
         </div>
     </div>
 
@@ -182,6 +198,34 @@
         // 初期状態で「コンテンツ生成を開始」ボタンを無効化
         startContentGenerationBtn.disabled = true;
 
+        // 現在の言語を取得する関数 - グローバルスコープに配置
+        function getCurrentLanguage() {
+            // 1. URLパラメータからlangを取得
+            const urlParams = new URLSearchParams(window.location.search);
+            let currentLang = urlParams.get('lang');
+
+            // 2. URLにlangパラメータがない場合、ページの言語設定からHTML要素やドキュメントの言語を確認
+            if (!currentLang) {
+                // HTML要素のlang属性を確認
+                const htmlLang = document.documentElement.lang;
+                if (htmlLang && (htmlLang === 'ja' || htmlLang.startsWith('ja-'))) {
+                    currentLang = 'ja';
+                } else {
+                    // 3. ブラウザの言語設定を確認
+                    const userLang = navigator.language || navigator.userLanguage;
+                    if (userLang && (userLang === 'ja' || userLang.startsWith('ja-'))) {
+                        currentLang = 'ja';
+                    } else {
+                        // 4. デフォルト言語は日本語
+                        currentLang = 'ja';
+                    }
+                }
+                console.log(`言語パラメータなし。自動検出: ${currentLang}`);
+            }
+
+            return currentLang;
+        }
+
         // モーダル表示関数
         function showModal(message) {
             modalMessage.textContent = message;
@@ -207,8 +251,13 @@
             generateJsonBtn.disabled = true;
 
             try {
+                // 現在の言語を取得（グローバル関数を使用）
+
+                // 現在の言語を取得
+                const currentLang = getCurrentLanguage();
+
                 // バックエンドの /generate-json-prompt エンドポイントを呼び出す
-                const response = await fetch(`${BACKEND_URL}/generate-json-prompt`, {
+                const response = await fetch(`${BACKEND_URL}/generate-json-prompt?lang=${currentLang}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -290,8 +339,12 @@
             progressBar.style.width = '0%';
 
             try {
+                // 現在の言語を取得（前に定義した関数を使用）
+                const currentLang = getCurrentLanguage();
+                console.log(`現在の言語: ${currentLang}`);
+
                 // Call backend's /generate-content endpoint
-                const response = await fetch(`${BACKEND_URL}/generate-content`, {
+                const response = await fetch(`${BACKEND_URL}/generate-content?lang=${currentLang}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
